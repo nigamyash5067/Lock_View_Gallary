@@ -1,30 +1,68 @@
 {
   "expo": {
-    "name": "lockview",
+    "name": "LockView",
     "slug": "lockview",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "scheme": "lockview",
     "newArchEnabled": true,
+    "platforms": ["ios", "android"],
     "splash": {
       "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
+      "backgroundColor": "#0F0F0F"
     },
-    "ios": {
-      "supportsTablet": true
+    "runtimeVersion": {
+      "policy": "appVersion"
     },
+    "updates": {
+      "url": "https://u.expo.dev/efa9333d-f05c-4007-b6fc-8d4ce9089598",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-updates",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "LockView needs access to your photos so you can select which ones to show."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0F0F0F"
       },
+      "package": "com.lockview.app",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_MEDIA_IMAGES"
+      ]
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "ios": {
+      "bundleIdentifier": "com.lockview.app",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "LockView needs access to your photos so you can select which ones to show."
+      }
+    },
+"extra": {
+      "router": {},
+      "eas": {
+        "projectId": "efa9333d-f05c-4007-b6fc-8d4ce9089598"
+      }
+    },
+    "owner": "nigam_yash"
   }
 }
