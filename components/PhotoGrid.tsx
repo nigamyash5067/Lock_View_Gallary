@@ -30,6 +30,7 @@ export function PhotoGrid({ photos, selectedUris, selectionMode, onToggle, onPre
       >
         <PhotoTile
           uri={item.uri}
+          assetId={item.id}
           isSelected={selectedUris.includes(item.uri)}
           selectionMode={selectionMode}
           onToggle={() => onToggle(item.uri)}
@@ -44,27 +45,21 @@ export function PhotoGrid({ photos, selectedUris, selectionMode, onToggle, onPre
 
   const keyExtractor = useCallback((item: MediaLibrary.Asset) => item.id, []);
 
-  const getItemLayout = useCallback(
-    (_: unknown, index: number) => ({
-      length: TILE_SIZE + SIZES.thumbnailGap,
-      offset: (TILE_SIZE + SIZES.thumbnailGap) * Math.floor(index / SIZES.thumbnailColumns),
-      index,
-    }),
-    []
-  );
-
+  // NOTE: deliberately NOT using getItemLayout here. With numColumns the
+  // per-item offset math is wrong (all items in a row share an offset), and on
+  // Android that combined with removeClippedSubviews unmounts visible cells,
+  // leaving blank/grey tiles. Letting FlatList measure naturally is correct.
   return (
     <FlatList
       data={photos}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       numColumns={SIZES.thumbnailColumns}
-      getItemLayout={getItemLayout}
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.5}
       contentContainerStyle={styles.list}
       showsVerticalScrollIndicator={false}
-      removeClippedSubviews
+      removeClippedSubviews={false}
       initialNumToRender={18}
       maxToRenderPerBatch={12}
       windowSize={10}

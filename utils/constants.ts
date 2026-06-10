@@ -23,4 +23,4 @@ export const SIZES = {
   pageIndicatorSize: 8,
 };
 
-export const RELEASE_VERSION = 'R.V.7';
+export const RELEASE_VERSION = 'R.V.8';

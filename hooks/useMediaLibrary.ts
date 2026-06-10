@@ -52,16 +52,12 @@ export function useMediaLibrary(): UseMediaLibraryResult {
     setLoading(true);
     setError(null);
     try {
-      const current = await getMediaPermission();
-      setAccessPrivileges(current.accessPrivileges);
-      setCanAskAgain(current.canAskAgain);
-
-      if (!current.canAskAgain && !current.granted && !current.limited) {
-        console.log('[LockView] requestPermission: canAskAgain=false, opening Settings');
-        await Linking.openSettings();
-        return;
-      }
-
+      // Always attempt the native request first. requestPermissionsAsync is
+      // safe even when the OS can't show a dialog (it returns the current
+      // status), and some Android OEM skins wrongly report canAskAgain=false
+      // on a fresh install — bouncing to Settings before ever asking would
+      // mean the real system prompt never appears. Settings is only a fallback
+      // *after* the request comes back not-usable AND non-askable.
       const res = await requestMediaPermission();
       setAccessPrivileges(res.accessPrivileges);
       setCanAskAgain(res.canAskAgain);

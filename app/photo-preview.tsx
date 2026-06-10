@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { COLORS, SIZES } from '../utils/constants';
@@ -10,14 +10,14 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 function PhotoPage({ uri }: { uri: string }) {
   const [scale, setScale] = useState(1);
-  const lastTap = { time: 0 };
+  const lastTap = useRef(0);
 
   const handleTap = () => {
     const now = Date.now();
-    if (now - lastTap.time < 300) {
+    if (now - lastTap.current < 300) {
       setScale((s) => (s > 1 ? 1 : 2));
     }
-    lastTap.time = now;
+    lastTap.current = now;
   };
 
   return (
@@ -30,6 +30,8 @@ function PhotoPage({ uri }: { uri: string }) {
         source={uri}
         style={[styles.image, { transform: [{ scale }] }]}
         contentFit="contain"
+        recyclingKey={uri}
+        cachePolicy="memory-disk"
       />
     </TouchableOpacity>
   );

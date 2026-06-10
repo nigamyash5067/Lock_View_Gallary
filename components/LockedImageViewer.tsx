@@ -43,6 +43,8 @@ function PhotoPage({ uri }: { uri: string }) {
           source={uri}
           style={[styles.image, { transform: [{ scale }] }]}
           contentFit="contain"
+          recyclingKey={uri}
+          cachePolicy="memory-disk"
         />
       </View>
     </TouchableWithoutFeedback>

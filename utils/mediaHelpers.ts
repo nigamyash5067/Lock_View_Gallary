@@ -56,6 +56,27 @@ export async function requestMediaPermission(): Promise<PermissionInfo> {
   };
 }
 
+// On Android (esp. 14–16 with limited/"Selected photos" access) a raw
+// asset.uri (file://) sometimes can't be read directly by the image loader.
+// getAssetInfoAsync resolves a guaranteed-readable localUri/content:// URI.
+// Cached so we only pay the native round-trip once per asset.
+const _localUriCache = new Map<string, string>();
+
+export async function resolveLocalUri(assetId: string, fallbackUri: string): Promise<string> {
+  if (_localUriCache.has(assetId)) {
+    return _localUriCache.get(assetId)!;
+  }
+  try {
+    const info = await MediaLibrary.getAssetInfoAsync(assetId);
+    const resolved = info.localUri ?? info.uri ?? fallbackUri;
+    _localUriCache.set(assetId, resolved);
+    return resolved;
+  } catch (e: any) {
+    console.log('[LockView] resolveLocalUri error:', e?.message);
+    return fallbackUri;
+  }
+}
+
 export async function fetchPhotos(
   cursor?: string,
   pageSize: number = 50

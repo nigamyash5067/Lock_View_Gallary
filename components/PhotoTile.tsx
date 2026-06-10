@@ -1,10 +1,12 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { Image } from 'expo-image';
 import { COLORS } from '../utils/constants';
+import { resolveLocalUri } from '../utils/mediaHelpers';
 
 interface PhotoTileProps {
   uri: string;
+  assetId: string;
   isSelected: boolean;
   selectionMode: boolean;
   onPreview: () => void;
@@ -15,6 +17,7 @@ interface PhotoTileProps {
 
 export const PhotoTile = React.memo(function PhotoTile({
   uri,
+  assetId,
   isSelected,
   selectionMode,
   onPreview,
@@ -23,6 +26,20 @@ export const PhotoTile = React.memo(function PhotoTile({
   size,
 }: PhotoTileProps) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [displayUri, setDisplayUri] = useState(uri);
+
+  // Reset to the raw uri whenever the tile is recycled for a new asset.
+  useEffect(() => {
+    setDisplayUri(uri);
+  }, [uri]);
+
+  // If the raw file:// uri fails to load (common with Android limited access),
+  // fall back to a resolved localUri/content:// URI.
+  const handleImageError = useCallback(() => {
+    resolveLocalUri(assetId, uri).then((resolved) => {
+      setDisplayUri((prev) => (resolved !== prev ? resolved : prev));
+    });
+  }, [assetId, uri]);
 
   const handlePressIn = useCallback(() => {
     Animated.spring(scaleAnim, {
@@ -64,7 +81,15 @@ export const PhotoTile = React.memo(function PhotoTile({
           { width: size, height: size, transform: [{ scale: scaleAnim }] },
         ]}
       >
-        <Image source={uri} style={styles.image} contentFit="cover" />
+        <Image
+          source={displayUri}
+          style={styles.image}
+          contentFit="cover"
+          recyclingKey={uri}
+          cachePolicy="memory-disk"
+          transition={150}
+          onError={handleImageError}
+        />
 
         {/* In selection mode: show checkbox on ALL tiles */}
         {selectionMode && (
